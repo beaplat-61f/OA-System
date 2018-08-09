@@ -38,7 +38,7 @@ export function getInfo(token) {
 
 export function logout() {
   return request({
-    url: '/user/logout',
+    url: '/sys/logout',
     method: 'post'
   })
 }
@@ -46,7 +46,6 @@ export function logout() {
 export function getMobileCode(params) {
   return request({
     url: '/captcha',
-    // method: 'get',
     params
   })
 }
