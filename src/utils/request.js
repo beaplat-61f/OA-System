@@ -6,9 +6,12 @@ import { getToken } from '@/utils/auth'
 // 创建axios实例
 const service = axios.create({
   baseURL: process.env.BASE_API, // api的base_url
+  headers: {
+    'token': localStorage.getItem('token')
+  },
   timeout: 5000 // 请求超时时间
 })
-
+service.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
 // request拦截器
 service.interceptors.request.use(config => {
   if (store.getters.token) {
@@ -21,16 +24,16 @@ service.interceptors.request.use(config => {
   Promise.reject(error)
 })
 
-// respone拦截器
+// response拦截器
 service.interceptors.response.use(
   response => {
   /**
   * code为非20000是抛错 可结合自己业务进行修改
   */
     const res = response.data
-    if (res.code !== 20000) {
+    if (res.code !== 0) {
       Message({
-        message: res.message,
+        message: res.msg,
         type: 'error',
         duration: 5 * 1000
       })
@@ -49,7 +52,7 @@ service.interceptors.response.use(
       }
       return Promise.reject('error')
     } else {
-      return response.data
+      return response
     }
   },
   error => {

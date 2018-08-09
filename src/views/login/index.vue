@@ -1,43 +1,60 @@
 <template>
   <div class="login-container">
     <el-form class="login-form" autoComplete="on" :model="loginForm" :rules="loginRules" ref="loginForm" label-position="left">
-      <h3 class="title">vue-element-admin</h3>
+      <h3 class="title">新动文化OA管理系统</h3>
       <el-form-item prop="username">
         <span class="svg-container svg-container_login">
           <svg-icon icon-class="user" />
         </span>
-        <el-input name="username" type="text" v-model="loginForm.username" autoComplete="on" placeholder="username" />
+        <el-input name="username" type="text" v-model="loginForm.username" autoComplete="on" placeholder="用户名" />
       </el-form-item>
       <el-form-item prop="password">
         <span class="svg-container">
           <svg-icon icon-class="password"></svg-icon>
         </span>
         <el-input name="password" :type="pwdType" @keyup.enter.native="handleLogin" v-model="loginForm.password" autoComplete="on"
-          placeholder="password"></el-input>
+          placeholder="密码"></el-input>
           <span class="show-pwd" @click="showPwd"><svg-icon icon-class="eye" /></span>
       </el-form-item>
-      <el-form-item>
-        <el-button type="primary" style="width:100%;" :loading="loading" @click.native.prevent="handleLogin">
-          Sign in
-        </el-button>
+
+      <el-form-item prop="mobile">
+        <span class="svg-container svg-container_login">
+          <svg-icon icon-class="user" />
+        </span>
+        <el-input name="mobile" type="text" v-model="loginForm.mobile" autoComplete="on" placeholder="手机号" />
       </el-form-item>
-      <div class="tips">
+
+      <el-form-item prop="code">
+        <span class="svg-container svg-container_login">
+          <svg-icon icon-class="user" />
+        </span>
+        <el-input name="code" type="text" v-model="loginForm.code" autoComplete="on" placeholder="验证码" style="width: 70%;" />
+        <span v-show="!showSecond" class="show-pwd btn-code" @click="getCode">获取验证码</span>
+        <span v-show="showSecond" class="show-pwd btn-code second">{{ second}} s</span>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" style="width:100%;" :loading="loading" @click.native.prevent="handleLogin">登录</el-button>
+      </el-form-item>
+      <!-- <div class="tips">
         <span style="margin-right:20px;">username: admin</span>
         <span> password: admin</span>
-      </div>
+      </div> -->
     </el-form>
   </div>
 </template>
 
 <script>
-import { isvalidUsername } from '@/utils/validate'
+// import { isvalidUsername } from '@/utils/validate'
+import { guid } from '@/utils/index'
+import { getMobileCode } from '@/api/login'
 
 export default {
   name: 'login',
   data() {
     const validateUsername = (rule, value, callback) => {
-      if (!isvalidUsername(value)) {
-        callback(new Error('请输入正确的用户名'))
+      // if (!isvalidUsername(value)) {
+      if (value.length === 0) {
+        callback(new Error('请输入用户名'))
       } else {
         callback()
       }
@@ -49,16 +66,40 @@ export default {
         callback()
       }
     }
+    const validateMobile = (rule, value, callback) => {
+      const pattern = /^0?(13|14|15|17|18|19)[0-9]{9}$/
+      if (!pattern.test(value)) {
+        callback(new Error('请输入正确的手机号'))
+      } else {
+        callback()
+      }
+    }
+    const validateCode = (rule, value, callback) => {
+      const pattern = /^\d{6}$/
+      if (!pattern.test(value)) {
+        callback(new Error('验证码必须为6位数字'))
+      } else {
+        callback()
+      }
+    }
     return {
       loginForm: {
-        username: 'admin',
-        password: 'admin'
+        username: 'shizhenfeng',
+        password: 'admin',
+        mobile: '18565659206',
+        code: ''
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
-        password: [{ required: true, trigger: 'blur', validator: validatePass }]
+        password: [{ required: true, trigger: 'blur', validator: validatePass }],
+        mobile: [{ required: true, trigger: 'blur', validator: validateMobile }],
+        code: [{ required: true, trigger: 'blur', validator: validateCode }]
       },
       loading: false,
+      timer: null,
+      showSecond: false,
+      second: '',
+      uuid: '',
       pwdType: 'password'
     }
   },
@@ -70,12 +111,56 @@ export default {
         this.pwdType = 'password'
       }
     },
+    getCode() {
+      getMobileCode({
+        uuid: this.uuid,
+        mobile: this.loginForm.mobile
+      })
+        .then(res => {
+          console.log(res)
+          this.$message({
+            message: '验证码发送成功',
+            type: 'success'
+          })
+          // 开始倒计时
+          if (!this.timer) {
+            this.second = 60
+            this.showSecond = true
+            this.timer = setInterval(() => {
+              if (this.second > 0 && this.second <= 60) {
+                this.second--
+              } else {
+                this.showSecond = false
+                clearInterval(this.timer)
+                this.timer = null
+              }
+            }, 1000)
+          }
+        })
+        .catch(err => {
+          console.log('err:', err)
+        })
+    },
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
-          this.$store.dispatch('Login', this.loginForm).then(() => {
+          const { username, password, mobile, code: captcha } = this.loginForm
+          const data = {
+            username,
+            password,
+            captcha,
+            mobile,
+            uuid: this.uuid
+          }
+          this.$store.dispatch('Login', data).then(res => {
+            console.log(res)
             this.loading = false
+            localStorage.setItem('token', res.data.token)
+            return this.$store.dispatch('GetInfo', data)
+            // this.$router.push({ path: '/' })
+          }).then(res => {
+            console.log(res)
             this.$router.push({ path: '/' })
           }).catch(() => {
             this.loading = false
@@ -86,6 +171,9 @@ export default {
         }
       })
     }
+  },
+  mounted() {
+    this.uuid = guid()
   }
 }
 </script>
@@ -177,6 +265,12 @@ $light_gray:#eee;
     color: $dark_gray;
     cursor: pointer;
     user-select: none;
+  }
+  .btn-code {
+    font-size: 14px;
+  }
+  .second {
+    cursor: not-allowed;
   }
 }
 </style>
