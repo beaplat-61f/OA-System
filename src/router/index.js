@@ -81,28 +81,6 @@ export const constantRouterMap = [
         ]
       },
       {
-        path: 'tree',
-        name: 'Tree',
-        component: () => import('@/views/tree/index'),
-        meta: { title: '部门管理', icon: 'tree' }
-      }
-    ]
-  },
-
-  {
-    path: '/system',
-    component: Layout,
-    redirect: '/system/department',
-    name: 'System',
-    meta: { title: 'Example', icon: 'example' },
-    children: [
-      /* {
-        path: 'table',
-        name: 'Table',
-        component: () => import('@/views/table/index'),
-        meta: { title: 'Table', icon: 'table' }
-      }, */
-      {
         path: 'department',
         name: 'Department',
         component: () => import('@/views/department/index'),
@@ -110,6 +88,22 @@ export const constantRouterMap = [
       }
     ]
   },
+
+  /* {
+    path: '/system',
+    component: Layout,
+    redirect: '/system/department',
+    name: 'System',
+    meta: { title: 'Example', icon: 'example' },
+    children: [
+      {
+        path: 'department',
+        name: 'Department',
+        component: () => import('@/views/department/index'),
+        meta: { title: '部门管理', icon: 'tree' }
+      }
+    ]
+  }, */
 
   {
     path: '/form',

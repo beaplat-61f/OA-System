@@ -1,10 +1,5 @@
 <template>
   <div class="app-container">
-
-    <el-tag style="margin-bottom:20px;">
-      <a href="https://github.com/PanJiaChen/vue-element-admin/tree/master/src/components/TreeTable" target="_blank">Documentation</a>
-    </el-tag>
-
     <tree-table :data="data" :evalFunc="func" :evalArgs="args" :expandAll="expandAll" border>
       <el-table-column label="事件" width="200">
         <template slot-scope="scope">
@@ -12,15 +7,15 @@
           <el-tag>{{scope.row.timeLine+'ms'}}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="时间线" prop="timeLine">
+      <el-table-column label="排序" prop="timeLine">
       </el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
-          <el-button type="text" @click="message(scope.row)">
+          <!-- <el-button type="text" @click="message(scope.row)"> -->
             <el-button type="primary" size="mini" icon="el-icon-edit" @click="handleUpdate(scope.row)">编辑</el-button>
             <el-button type="success" size="mini" icon="el-icon-plus" @click="handleUpdate(scope.row)">添加</el-button>
             <el-button type="danger" size="mini" icon="el-icon-delete" @click="handleUpdate(scope.row)">删除</el-button>
-          </el-button>
+          <!-- </el-button> -->
         </template>
       </el-table-column>
     </tree-table>
@@ -28,10 +23,6 @@
 </template>
 
 <script>
-/**
-  Auth: Lei.j1ang
-  Created: 2018/1/19-14:54
-*/
 import treeTable from '@/components/TreeTable'
 import treeToArray from './customEval'
 
