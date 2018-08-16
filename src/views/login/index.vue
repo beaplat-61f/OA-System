@@ -84,9 +84,9 @@ export default {
     }
     return {
       loginForm: {
-        username: 'shizhenfeng',
+        username: 'admin',
         password: 'admin',
-        mobile: '18565659206',
+        mobile: '17301928525',
         code: ''
       },
       loginRules: {

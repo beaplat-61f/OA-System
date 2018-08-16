@@ -8,7 +8,7 @@
             <span>选择部门</span>
             <!-- <el-button style="float: right; padding: 3px 0" type="text">操作按钮</el-button> -->
           </div>
-          <el-tree :data="tree" :props="defaultProps" @node-click="handleNodeClick" node-key="id"></el-tree>
+          <el-tree :data="departments" :props="defaultProps" @node-click="handleNodeClick" node-key="id"></el-tree>
         </el-card>
         <!-- <button @click="show">Show</button> -->
       </el-col>
@@ -20,11 +20,14 @@
 </template>
 
 <script>
+import { selectDepartment } from '@/api/department'
+
 export default {
   name: 'user',
   data() {
     return {
       message: 'world',
+      departments: [],
       tree: [{
         id: 1,
         label: '一级 1',
@@ -85,9 +88,23 @@ export default {
     },
     show() {
       this.$router.push({ path: '/system/user/list' })
+    },
+    getList() {
+      selectDepartment()
+        .then(res => {
+          console.log(res)
+          // code
+          this.departments = res.data.deptList
+        })
+        .catch(err => {
+          console.log(err)
+        })
     }
   },
   computed: {
+  },
+  mounted() {
+    this.getList()
   }
 }
 </script>

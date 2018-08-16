@@ -249,18 +249,6 @@ export default {
     }
   },
   methods: {
-    /* resetForm() {
-      this.form = {
-        name: '',
-        region: '',
-        date1: '',
-        date2: '',
-        delivery: false,
-        type: [],
-        resource: '',
-        desc: ''
-      }
-    }, */
     handleFilter() {
       // todo
     },
@@ -276,6 +264,16 @@ export default {
     },
     resetForm(formName) {
       // this.$refs[formName].resetFields()
+      this.ruleForm = {
+        name: '',
+        region: '',
+        date1: '',
+        date2: '',
+        delivery: false,
+        type: [],
+        resource: '',
+        desc: ''
+      }
     },
     openCreateDialog() {
       this.resetForm()
