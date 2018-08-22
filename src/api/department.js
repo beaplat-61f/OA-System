@@ -14,10 +14,17 @@ export function createDepartment(data) {
   })
 }
 
-export function updateDepartment(params) {
+export function updateDepartment(data) {
   return request({
-    url: '/table/list',
-    method: 'get',
-    params
+    url: '/sys/dept/update',
+    method: 'PUT',
+    data
+  })
+}
+
+export function deleteDepartment(params) {
+  return request({
+    url: `/sys/dept/delete/${params.id}`,
+    method: 'DELETE'
   })
 }

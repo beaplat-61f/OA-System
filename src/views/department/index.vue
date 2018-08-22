@@ -95,7 +95,7 @@
         <el-button @click="dialogFormVisible = false">取 消</el-button>
         
         <el-button type="primary" @click="submitCreateForm('ruleForm')" v-if="dialogStatus === 'create'">添 加</el-button>
-        <el-button type="primary" @click="dialogFormVisible = false" v-else>修 改</el-button>
+        <el-button type="primary" @click="submitUpdateForm('ruleForm')" v-else>修 改</el-button>
       </div>
     </el-dialog>
   </div>
@@ -251,6 +251,39 @@ export default {
         }
       })
     },
+    submitUpdateForm(formName) {
+      // console.log(this.ruleForm)
+      const {
+        deptId,
+        parentId,
+        name,
+        orderNum,
+        delFlag
+      } = this.ruleForm
+      const data = {
+        deptId,
+        parentId,
+        name,
+        orderNum,
+        delFlag
+      }
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          api.updateDepartment(data)
+            .then(res => {
+              console.log(res)
+              this.getList()
+              this.dialogFormVisible = false
+            })
+            .catch(err => {
+              console.log(err)
+            })
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
+    },
     getList() {
       api.selectDepartment()
         .then(res => {
@@ -290,14 +323,22 @@ export default {
       this.dialogFormVisible = true
     },
     openUpdateDialog(row) {
-      console.log(row)
+      this.ruleForm = Object.assign({}, row)
+      console.log(this.ruleForm)
+      this.parent = row.parentName
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
     },
     openDeleteConfirm(row) {
       this.$confirm(`确认删除部门 ${row.name} 吗?`)
         .then(_ => {
-          console.log('You choose yes')
+          // console.log('You choose yes')
+          return api.deleteDepartment({
+            id: row.deptId
+          })
+        })
+        .then(res => {
+          this.getList()
         })
         .catch(_ => {})
     },

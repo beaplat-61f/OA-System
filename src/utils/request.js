@@ -51,6 +51,16 @@ service.interceptors.response.use(
       }
       return Promise.reject('error')
     } else {
+      // 全局成功提醒
+      const method = response.config.method || 'get'
+      if (method !== 'get') {
+        const message = method === 'post' ? '添加成功' : method === 'put' ? '修改成功' : '删除成功'
+        Message({
+          message,
+          type: 'success',
+          duration: 5 * 1000
+        })
+      }
       return response
     }
   },

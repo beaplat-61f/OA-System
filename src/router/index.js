@@ -66,19 +66,19 @@ export const constantRouterMap = [
     meta: { title: '系统管理', icon: 'example' },
     children: [
       {
-        path: '/system/user',
+        path: 'user',
         name: 'User',
         component: () => import('@/views/user/index'),
-        meta: { title: '用户管理parent', icon: 'table' },
-        redirect: '/system/user/list',
-        children: [
+        meta: { title: '用户管理', icon: 'table' }
+        // redirect: '/system/user/list',
+        /* children: [
           {
             path: 'list',
             name: 'UserList',
             component: () => import('@/views/user/list'),
             meta: { title: '用户管理', icon: 'tree' }
           }
-        ]
+        ] */
       },
       {
         path: 'department',

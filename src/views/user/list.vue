@@ -96,8 +96,29 @@
           </el-select>
         </el-form-item>
       </el-form> -->
-      <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-        <el-form-item label="活动名称" prop="name">
+      <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="form-container">
+        <el-form-item label="工号" prop="empNum">
+          <el-input v-model="ruleForm.empNum"></el-input>
+        </el-form-item>
+        <el-form-item label="姓名" prop="name">
+          <el-input v-model="ruleForm.name"></el-input>
+        </el-form-item>
+        <el-form-item label="手机" prop="mobile">
+          <el-input v-model="ruleForm.mobile"></el-input>
+        </el-form-item>
+        <el-form-item label="性别" prop="sex">
+          <el-radio-group v-model="ruleForm.sex">
+            <el-radio :label="1">男</el-radio>
+            <el-radio :label="2">女</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="部门" prop="empNum">
+          <el-input v-model="ruleForm.empNum"></el-input>
+        </el-form-item>
+        <el-form-item label="上级领导" prop="empNum">
+          <el-input v-model="ruleForm.empNum"></el-input>
+        </el-form-item>
+        <!-- <el-form-item label="活动名称" prop="name">
           <el-input v-model="ruleForm.name"></el-input>
         </el-form-item>
         <el-form-item label="活动区域" prop="region">
@@ -138,7 +159,7 @@
         </el-form-item>
         <el-form-item label="活动形式" prop="desc">
           <el-input type="textarea" v-model="ruleForm.desc"></el-input>
-        </el-form-item>
+        </el-form-item> -->
         <!-- <el-form-item>
           <el-button type="primary" @click="submitForm('ruleForm')">立即创建</el-button>
           <el-button @click="resetForm('ruleForm')">重置</el-button>
@@ -166,28 +187,15 @@ export default {
         pageSize: 10
       },
       total: 23,
-      // dialogTitle: '',
       dialogStatus: 'create',
       dialogFormVisible: false,
-      form: {
-        name: '',
-        region: '',
-        date1: '',
-        date2: '',
-        delivery: false,
-        type: [],
-        resource: '',
-        desc: ''
-      },
       ruleForm: {
+        empNum: '',
         name: '',
-        region: '',
-        date1: '',
-        date2: '',
-        delivery: false,
-        type: [],
-        resource: '',
-        desc: ''
+        mobile: '',
+        sex: '2',
+        deptId: 1,
+        superiorId: 1
       },
       rules: {
         name: [
@@ -265,14 +273,12 @@ export default {
     resetForm(formName) {
       // this.$refs[formName].resetFields()
       this.ruleForm = {
+        empNum: '',
         name: '',
-        region: '',
-        date1: '',
-        date2: '',
-        delivery: false,
-        type: [],
-        resource: '',
-        desc: ''
+        mobile: '',
+        sex: 2,
+        deptId: 1,
+        superiorId: 1
       }
     },
     openCreateDialog() {
