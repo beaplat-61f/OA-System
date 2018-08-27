@@ -52,9 +52,13 @@ service.interceptors.response.use(
       return Promise.reject('error')
     } else {
       // 全局成功提醒
+      console.log(response)
       const method = response.config.method || 'get'
       if (method !== 'get') {
-        const message = method === 'post' ? '添加成功' : method === 'put' ? '修改成功' : '删除成功'
+        let message = method === 'post' ? '添加成功' : method === 'put' ? '修改成功' : '删除成功'
+        if (response.config.url === '/api/sys/login') {
+          message = '登录成功'
+        }
         Message({
           message,
           type: 'success',

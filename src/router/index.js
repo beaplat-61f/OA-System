@@ -59,6 +59,18 @@ export const constantRouterMap = [
     ]
   }, */
   {
+    path: '/dashboard',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'Dashboard',
+        component: () => import('@/views/dashboard/index'),
+        meta: { title: '首页', icon: 'form' }
+      }
+    ]
+  },
+  {
     path: '/system',
     component: Layout,
     redirect: '/system/user',
@@ -70,21 +82,18 @@ export const constantRouterMap = [
         name: 'User',
         component: () => import('@/views/user/index'),
         meta: { title: '用户管理', icon: 'table' }
-        // redirect: '/system/user/list',
-        /* children: [
-          {
-            path: 'list',
-            name: 'UserList',
-            component: () => import('@/views/user/list'),
-            meta: { title: '用户管理', icon: 'tree' }
-          }
-        ] */
       },
       {
         path: 'department',
         name: 'Department',
         component: () => import('@/views/department/index'),
         meta: { title: '部门管理', icon: 'tree' }
+      },
+      {
+        path: 'post',
+        name: 'Post',
+        component: () => import('@/views/post/index'),
+        meta: { title: '岗位管理', icon: 'tree' }
       }
     ]
   },
@@ -105,7 +114,7 @@ export const constantRouterMap = [
     ]
   }, */
 
-  {
+  /* {
     path: '/form',
     component: Layout,
     children: [
@@ -116,7 +125,7 @@ export const constantRouterMap = [
         meta: { title: 'Form', icon: 'form' }
       }
     ]
-  },
+  }, */
 
   { path: '*', redirect: '/404', hidden: true }
 ]

@@ -35,10 +35,11 @@
       <el-form-item>
         <el-button type="primary" style="width:100%;" :loading="loading" @click.native.prevent="handleLogin">登录</el-button>
       </el-form-item>
-      <!-- <div class="tips">
-        <span style="margin-right:20px;">username: admin</span>
-        <span> password: admin</span>
-      </div> -->
+      <div class="tips">
+        <span>当前为Beta版 直接点击登录即可</span>
+        <!-- <span style="margin-right:20px;">username: admin</span>
+        <span> password: admin</span> -->
+      </div>
     </el-form>
   </div>
 </template>
@@ -87,7 +88,7 @@ export default {
         username: 'admin',
         password: 'admin',
         mobile: '17301928525',
-        code: ''
+        code: '123456'
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],

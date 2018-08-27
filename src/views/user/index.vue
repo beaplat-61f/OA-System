@@ -1,6 +1,5 @@
 <template>
   <div class="app-container">
-    <!-- Hello, {{ message }} -->
     <el-row :gutter="20">
       <el-col :span="6">
         <el-card class="box-card">
@@ -8,20 +7,19 @@
             <span>选择部门</span>
             <!-- <el-button style="float: right; padding: 3px 0" type="text">操作按钮</el-button> -->
           </div>
-          <el-tree :data="departments" :props="defaultProps" @node-click="handleNodeClick" node-key="id"></el-tree>
+          <el-tree :data="departments" :props="defaultProps" @node-click="handleNodeClick" node-key="id" default-expand-all highlight-current check-on-click-node></el-tree>
         </el-card>
-        <!-- <button @click="show">Show</button> -->
       </el-col>
       <el-col :span="18">
-        <!-- <router-view></router-view> -->
         <div class="filter-container">
-          <el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="姓名" v-model="listQuery.title">
+          <el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="姓名" v-model="listQuery.name">
           </el-input>
           <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">搜索</el-button>
           <el-button class="filter-item" style="margin-left: 10px;" @click="openCreateDialog" type="primary" icon="el-icon-plus">添加</el-button>
           <el-button class="filter-item" type="danger" icon="el-icon-delete" @click="openMultipleDeleteConfirm">删除</el-button>
         </div>
         <el-table
+          v-loading="loading"
           ref="multipleTable"
           :data="users"
           tooltip-effect="dark"
@@ -71,7 +69,7 @@
 
           <el-table-column label="操作" fixed="right" width="180">
             <template slot-scope="scope">
-              <el-button type="primary" icon="el-icon-edit" @click="openUpdateDialog(scope.row)">编辑</el-button>
+              <el-button type="primary" icon="el-icon-edit" @click="openUpdateDialog(scope.row.userId)">编辑</el-button>
               <!-- <el-button type="success" size="mini" icon="el-icon-plus" @click="openCreateDialog(scope.row)">添加</el-button> -->
               <el-button type="danger" icon="el-icon-delete" @click="openDeleteConfirm(scope.row)">删除</el-button>
             </template>
@@ -86,7 +84,15 @@
         </el-table>
 
         <div class="pagination-container">
-          <el-pagination background @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="listQuery.page" :page-sizes="[10, 20, 30, 50]" :page-size="listQuery.pageSize" layout="total, sizes, prev, pager, next, jumper" :total="total">
+          <el-pagination
+            background
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            :current-page="listQuery.page"
+            :page-sizes="[10, 20, 30, 50]"
+            :page-size="listQuery.limit"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="total">
           </el-pagination>
         </div>
 
@@ -108,7 +114,7 @@
                 <el-radio :label="2">女</el-radio>
               </el-radio-group>
             </el-form-item>
-            <el-form-item label="部门" prop="department">
+            <el-form-item label="部门" prop="department" required>
               <el-input v-model="departmentName" disabled=""></el-input>
               <el-popover
                 placement="right"
@@ -156,14 +162,16 @@ export default {
         children: 'children',
         label: 'label'
       },
+      loading: true,
       listQuery: {
-        title: '',
+        name: '',
+        deptId: '',
         page: 1,
-        pageSize: 10
+        limit: 10
       },
       selectIds: [],
       selectNames: [],
-      total: 23,
+      total: 0,
       dialogStatus: 'create',
       dialogFormVisible: false,
       ruleForm: {
@@ -172,7 +180,7 @@ export default {
         mobile: '',
         sex: '2',
         deptId: 1,
-        superiorId: 1
+        superiorId: 0
       },
       users: [],
       timeout: null,
@@ -190,44 +198,29 @@ export default {
         sex: [
           { required: true, message: '请选择性别', trigger: 'blur' }
         ]
-        // selectDepartment: [
+        // departmentName: [
         //   { required: true, message: '请选择部门', trigger: 'blur' }
-        // ],
+        // ]
         // superior: [
         //   { required: true, message: '请选择上级领导', trigger: 'blur' }
         // ]
       },
       formLabelWidth: '120px',
-      tableData3: [
-        {
-          id: 1208,
-          date: '2016-05-03',
-          name: '王小虎',
-          email: '1029373737@qq.com',
-          status: true,
-          address: '上海市普陀区金沙江路 1518 弄'
-        },
-        {
-          id: 1208,
-          date: '2016-05-03',
-          name: '王小虎',
-          email: '1029373737@qq.com',
-          status: false,
-          address: '上海市普陀区金沙江路 1518 弄'
-        },
-        {
-          id: 1208,
-          date: '2016-05-03',
-          name: '王小虎',
-          email: '1029373737@qq.com',
-          status: false,
-          address: '上海市普陀区金沙江路 1518 弄'
-        }
-      ],
       multipleSelection: []
     }
   },
   methods: {
+    openDeleteConfirm(row) {
+      this.$confirm(`确认删除员工 ${row.name} 吗?`)
+        .then(_ => {
+          // const data = this.selectIds
+          return api.deleteUser([row.userId])
+        })
+        .then(res => {
+          this.getUserList()
+        })
+        .catch(_ => {})
+    },
     openMultipleDeleteConfirm() {
       const names = this.selectNames.join()
       const length = this.selectNames.length
@@ -237,24 +230,27 @@ export default {
       }
       this.$confirm(`确认删除员工 ${names} 共 ${length} 位员工吗?`)
         .then(_ => {
-          const data = JSON.stringify(this.selectIds)
+          const data = this.selectIds
+          // console.log(data, JSON.stringify(data))
           return api.deleteUser(data)
         })
         .then(res => {
-          this.getList()
+          this.getUserList()
         })
         .catch(_ => {})
     },
     handleSizeChange(val) {
-      this.listQuery.pageSize = val
-      this.getList()
+      this.listQuery.limit = val
+      this.getUserList()
     },
     handleCurrentChange(val) {
       this.listQuery.page = val
-      this.getList()
+      this.getUserList()
     },
     handleNodeClick(data) {
-      console.log(data)
+      // console.log(data)
+      this.listQuery.deptId = data.id
+      this.getUserList()
     },
     handleTreeNodeClick(data) {
       console.log(data)
@@ -264,7 +260,7 @@ export default {
     show() {
       this.$router.push({ path: '/system/user/list' })
     },
-    getList() {
+    getDeptList() {
       api.selectDepartment()
         .then(res => {
           console.log(res)
@@ -275,18 +271,22 @@ export default {
           console.log(err)
         })
     },
-    getAllUser() {
+    getUserList() {
+      this.loading = true
       const params = Object.assign({}, this.listQuery)
       api.selectUser(params)
         .then(res => {
           this.users = res.data.page.list
+          this.total = res.data.page.totalCount
+          this.loading = false
         })
         .catch(err => {
           console.log(err)
+          this.loading = false
         })
     },
     handleFilter() {
-      // todo
+      this.getUserList()
     },
     submitCreateForm(formName) {
       this.$refs[formName].validate(valid => {
@@ -301,7 +301,7 @@ export default {
               //   type: 'success'
               // })
               this.dialogFormVisible = false
-              this.getList()
+              this.getUserList()
             })
             .catch(err => {
               console.log(err)
@@ -325,7 +325,7 @@ export default {
               //   type: 'success'
               // })
               this.dialogFormVisible = false
-              this.getList()
+              this.getUserList()
             })
             .catch(err => {
               console.log(err)
@@ -337,26 +337,35 @@ export default {
       })
     },
     resetForm(formName) {
-      // this.$refs[formName].resetFields()
       this.ruleForm = {
         empNum: '',
         name: '',
         mobile: '',
         sex: 2,
         deptId: 1,
-        superiorId: 1
+        superiorId: 0
       }
+      this.departmentName = ''
+      this.superior = ''
     },
     openCreateDialog() {
       this.resetForm()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
     },
-    openUpdateDialog(row) {
-      // Get form value
-      this.ruleForm = row
-      this.dialogStatus = 'update'
-      this.dialogFormVisible = true
+    openUpdateDialog(id) {
+      api.singleUser(id)
+        .then(res => {
+          const row = res.data.user
+          this.ruleForm = row
+          this.departmentName = row.deptName
+          this.superior = row.superiorName
+          this.dialogStatus = 'update'
+          this.dialogFormVisible = true
+        })
+        .catch(err => {
+          console.log(err)
+        })
     },
     handleSelectionChange(val) {
       this.multipleSelection = val
@@ -392,8 +401,8 @@ export default {
     }
   },
   mounted() {
-    this.getList()
-    this.getAllUser()
+    this.getDeptList()
+    this.getUserList()
   }
 }
 </script>

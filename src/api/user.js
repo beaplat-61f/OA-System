@@ -11,6 +11,11 @@ export function selectUser(params) {
     params
   })
 }
+export function singleUser(id) {
+  return request({
+    url: `/sys/user/info/${id}`
+  })
+}
 export function createUser(data) {
   return request({
     url: '/sys/user/save',

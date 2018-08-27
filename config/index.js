@@ -12,7 +12,7 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/api': {
-        target: 'http://192.168.18.215:8090/oa-debug',
+        target: 'http://192.168.18.215:17016/oa-debug',
         changeOrigin: true,
         pathRewrite: {
           '^/api': '/'
@@ -71,7 +71,7 @@ module.exports = {
      * then assetsPublicPath should be set to "/bar/".
      * In most cases please use '/' !!!
      */
-    assetsPublicPath: '/vueAdmin-template/', // If you are deployed on the root path, please use '/'
+    assetsPublicPath: '/', // If you are deployed on the root path, please use '/'
 
     /**
      * Source Maps
